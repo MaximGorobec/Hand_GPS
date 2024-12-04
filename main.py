@@ -1,4 +1,3 @@
-
 import sys
 import sqlite3
 
@@ -41,18 +40,21 @@ class MyWidget(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Ручной GPS')
-        uic.loadUi('sputnik.ui', self)  # Загружаем дизайн
+        uic.loadUi('sputnik.ui', self)
         self.con = sqlite3.connect("main.sqlite")
         self.sputniks = list()
         self.dm = False
-
         self.DB = self.con.cursor()
+        # создание БД
+        if len(self.DB.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='sputniks'").fetchall()) == 0:
+            self.DB.execute('''CREATE TABLE sputniks(name, x, y, z);''')
+            self.DB.execute('''CREATE TABLE dots(name, x, y, z);''')
+
         self.save_sputnik_button.clicked.connect(self.save_sputnik)
         self.calc_cord_button.clicked.connect(self.calc_cord)
 
         self.sputnik_table.cellClicked.connect(self.add_sputnik)
         self.change_fon_button.clicked.connect(self.change_fon)
-        #self.test_button.clicked.connect(self.test)
         # обновление таблиц
         self.sinchronize_sputniks()
         self.sinchronize_dots()
